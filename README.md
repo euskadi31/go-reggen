@@ -1,7 +1,9 @@
-Reg-gen
-=======
+Reggen
+======
 
-This package generates strings based on regular expressions
+This package generates strings based on regular expressions.
+
+This is a fork of [lucasjones/reggen](https://github.com/lucasjones/reggen)
 
 # Try it [here](https://lucasjones.github.io/reggen)
 
@@ -14,12 +16,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/lucasjones/reggen"
+	"github.com/euskadi31/go-reggen"
 )
 
 func main() {
 	// generate a single string
-	str, err := reggen.Generate("^[a-z]{5,10}@[a-z]{5,10}\\.(com|net|org)$", 10)
+	str, err := reggen.Generate("^[a-z]{5,10}@[a-z]{5,10}\\.(com|net|org)$")
 	if err != nil {
 		panic(err)
 	}
@@ -49,3 +51,8 @@ bxnpubwc@kwrdbvjic.com
 01111
 01001
 ```
+
+
+## License
+
+go-reggen is licensed under [the MIT license](LICENSE.md).

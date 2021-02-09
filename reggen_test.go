@@ -1,10 +1,11 @@
 package reggen
 
 import (
-	"fmt"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type testCase struct {
@@ -32,52 +33,40 @@ func TestGenerate(t *testing.T) {
 	for _, test := range cases {
 		for i := 0; i < 10; i++ {
 			r, err := NewGenerator(test.regex)
-			if err != nil {
-				t.Fatal("Error creating generator: ", err)
-			}
-			r.debug = false
+			assert.NoError(t, err)
+
 			res := r.Generate(10)
-			// only print first result
-			if i < 1 {
-				fmt.Printf("Regex: %v Result: \"%s\"\n", test.regex, res)
-			}
+
 			re, err := regexp.Compile(test.regex)
-			if err != nil {
-				t.Fatal("Invalid test case. regex: ", test.regex, " failed to compile:", err)
-			}
-			if !re.MatchString(res) {
-				t.Error("Generated data does not match regex. Regex: ", test.regex, " output: ", res)
-			}
+			assert.NoError(t, err)
+
+			assert.True(t, re.MatchString(res), "Generated data does not match regex. Regex: %q output: %q", test.regex, res)
 		}
 	}
 }
 
 func TestSeed(t *testing.T) {
 	g1, err := NewGenerator(cases[0].regex)
-	if err != nil {
-		t.Fatal("Error creating generator: ", err)
-	}
+	assert.NoError(t, err)
+
 	g2, err := NewGenerator(cases[0].regex)
-	if err != nil {
-		t.Fatal("Error creating generator: ", err)
-	}
+	assert.NoError(t, err)
+
 	currentTime := time.Now().UnixNano()
-	g1.SetSeed(currentTime)
-	g2.SetSeed(currentTime)
+
+	g1.Seed(currentTime)
+	g2.Seed(currentTime)
+
 	for i := 0; i < 10; i++ {
-		if g1.Generate(100) != g2.Generate(100) {
-			t.Error("Results are not reproducible")
-		}
+		assert.Equal(t, g1.Generate(100), g2.Generate(100))
 	}
 
-	g1.SetSeed(123)
-	g2.SetSeed(456)
-	for i := 0; i < 10; i++ {
-		if g1.Generate(100) == g2.Generate(100) {
-			t.Error("Results should not match")
-		}
-	}
+	g1.Seed(123)
+	g2.Seed(456)
 
+	for i := 0; i < 10; i++ {
+		assert.NotEqual(t, g1.Generate(100), g2.Generate(100))
+	}
 }
 
 func BenchmarkGenerate(b *testing.B) {
