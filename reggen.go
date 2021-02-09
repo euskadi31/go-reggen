@@ -41,6 +41,7 @@ func NewGenerator(regex string) (*Generator, error) {
 	return g, nil
 }
 
+//nolint:gocyclo
 func (g *Generator) generate(s *state, re *syntax.Regexp) string {
 	//fmt.Println("re:", re, "sub:", re.Sub)
 	op := re.Op
@@ -86,7 +87,7 @@ func (g *Generator) generate(s *state, re *syntax.Regexp) string {
 			}
 		}
 
-		r := g.rand.Intn(int(sum))
+		r := g.rand.Intn(sum)
 		var ru rune
 		sum = 0
 		for i := 0; i < len(re.Rune); i += 2 {
@@ -184,5 +185,6 @@ func (g *Generator) Generate(limit int) string {
 
 // Seed define new seed
 func (g *Generator) Seed(seed int64) {
+	//nolint:gosec
 	g.rand = rand.New(rand.NewSource(seed))
 }
